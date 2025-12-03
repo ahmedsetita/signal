@@ -1,413 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Audio Signal Processor</title>
-<style>
-:root{
-  --bg:#050816;
-  --bg-alt:#020617;
-  --accent:#00e9ff;
-  --accent-2:#ff00cc;
-  --accent-soft:rgba(0,233,255,0.2);
-  --card-bg:rgba(15,23,42,0.92);
-  --border-soft:rgba(148,163,184,0.2);
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --danger:#f97316;
-  --radius:18px;
-  --shadow-strong:0 20px 45px rgba(0,0,0,0.75);
-}
+  <meta charset="UTF-8">
+  <title>Audio Signal Processor</title>
+  <!-- مهم عشان الموبايل يتظبط -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root{
+      --bg:#050816;
+      --bg-alt:#020617;
+      --accent:#00e9ff;
+      --accent-2:#ff00cc;
+      --accent-soft:rgba(0,233,255,0.2);
+      --card-bg:rgba(15,23,42,0.92);
+      --border-soft:rgba(148,163,184,0.2);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --radius:18px;
+      --shadow-strong:0 20px 45px rgba(0,0,0,0.75);
+    }
 
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
 
-body{
-  min-height:100vh;
-  margin:0;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:
-    radial-gradient(circle at 0% 0%,rgba(148,163,253,0.18),transparent 55%),
-    radial-gradient(circle at 100% 100%,rgba(45,212,191,0.16),transparent 55%),
-    linear-gradient(135deg,#020617,#020617 40%,#050816 100%);
-  color:var(--text);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-}
+    html, body{
+      max-width:100%;
+      overflow-x:hidden;
+      height:100%;
+    }
 
-/* ===== Shell ===== */
-.app-shell{
-  width:100%;
-  max-width:1100px;
-  background:linear-gradient(145deg,rgba(15,23,42,0.96),rgba(15,23,42,0.85));
-  border-radius:24px;
-  border:1px solid rgba(148,163,184,0.3);
-  box-shadow:var(--shadow-strong);
-  padding:24px 22px 20px;
-  position:relative;
-  overflow:hidden;
-}
+    body{
+      min-height:100vh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%,rgba(148,163,253,0.18),transparent 55%),
+        radial-gradient(circle at 100% 100%,rgba(45,212,191,0.16),transparent 55%),
+        linear-gradient(135deg,#020617,#020617 40%,#050816 100%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
 
-.app-shell::before{
-  content:"DSP PROJECT";
-  position:absolute;
-  top:-40px;
-  right:-100px;
-  font-size:90px;
-  font-weight:800;
-  letter-spacing:0.15em;
-  color:rgba(15,23,42,0.7);
-  pointer-events:none;
-}
+    /* ===== Shell ===== */
+    .app-shell{
+      width:100%;
+      max-width:1100px;
+      background:linear-gradient(145deg,rgba(15,23,42,0.96),rgba(15,23,42,0.85));
+      border-radius:24px;
+      border:1px solid rgba(148,163,184,0.3);
+      box-shadow:var(--shadow-strong);
+      padding:24px 22px 20px;
+      position:relative;
+      overflow:hidden;
+    }
 
-/* ===== Header ===== */
-.app-header{
-  display:flex;
-  justify-content:space-between;
-  gap:16px;
-  align-items:flex-start;
-  margin-bottom:18px;
-}
+    .app-shell::before{
+      content:"DSP PROJECT";
+      position:absolute;
+      top:-40px;
+      right:-100px;
+      font-size:90px;
+      font-weight:800;
+      letter-spacing:0.15em;
+      color:rgba(15,23,42,0.7);
+      pointer-events:none;
+    }
 
-.title-block h1{
-  font-size:clamp(1.9rem,3vw,2.4rem);
-  letter-spacing:0.08em;
-  text-transform:uppercase;
-  background:linear-gradient(120deg,#e5e7eb,#38bdf8,#a855f7);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
+    /* ===== Header ===== */
+    .app-header{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
 
-.title-block p{
-  margin-top:4px;
-  font-size:0.9rem;
-  color:var(--muted);
-}
+    .title-block h1{
+      font-size:clamp(1.8rem,3vw,2.4rem);
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      background:linear-gradient(120deg,#e5e7eb,#38bdf8,#a855f7);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
 
-.badge{
-  align-self:flex-start;
-  padding:6px 11px;
-  border-radius:999px;
-  border:1px solid rgba(56,189,248,0.5);
-  background:linear-gradient(135deg,rgba(15,23,42,0.9),rgba(15,23,42,0.6));
-  font-size:0.8rem;
-  display:flex;
-  gap:6px;
-  align-items:center;
-  color:#e0f2fe;
-}
-.badge-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:radial-gradient(circle,var(--accent),transparent 60%);
-  box-shadow:0 0 10px rgba(56,189,248,0.8);
-}
+    .title-block p{
+      margin-top:4px;
+      font-size:0.9rem;
+      color:var(--muted);
+      max-width:520px;
+    }
 
-/* ===== Layout ===== */
-.content-grid{
-  display:grid;
-  grid-template-columns: minmax(0,1.3fr) minmax(0,1fr);
-  gap:18px;
-}
+    .badge{
+      align-self:flex-start;
+      padding:6px 11px;
+      border-radius:999px;
+      border:1px solid rgba(56,189,248,0.5);
+      background:linear-gradient(135deg,rgba(15,23,42,0.9),rgba(15,23,42,0.6));
+      font-size:0.8rem;
+      display:flex;
+      gap:6px;
+      align-items:center;
+      color:#e0f2fe;
+      white-space:nowrap;
+    }
+    .badge-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:radial-gradient(circle,var(--accent),transparent 60%);
+      box-shadow:0 0 10px rgba(56,189,248,0.8);
+    }
 
-@media (max-width:900px){
-  .content-grid{
-    grid-template-columns:1fr;
-  }
-}
+    /* وصف صغير بالعربي */
+    .project-intro{
+      margin-bottom:14px;
+      font-size:0.9rem;
+      color:#cbd5f5;
+      max-width:720px;
+      line-height:1.5;
+    }
 
-/* ===== Panel generic ===== */
-.panel{
-  background:radial-gradient(circle at 0 0,rgba(15,118,110,0.28),transparent 55%),
-             radial-gradient(circle at 100% 100%,rgba(30,64,175,0.28),transparent 55%),
-             linear-gradient(145deg,rgba(15,23,42,0.96),rgba(15,23,42,0.92));
-  border-radius:var(--radius);
-  border:1px solid var(--border-soft);
-  padding:16px 16px 14px;
-  position:relative;
-  overflow:hidden;
-}
+    /* ===== Layout ===== */
+    .content-grid{
+      display:grid;
+      grid-template-columns: minmax(0,1.3fr) minmax(0,1fr);
+      gap:18px;
+    }
 
-.panel h2{
-  font-size:0.95rem;
-  text-transform:uppercase;
-  letter-spacing:0.18em;
-  color:var(--muted);
-  margin-bottom:10px;
-}
+    @media (max-width:900px){
+      body{
+        padding:14px;
+        align-items:flex-start;
+      }
+      .app-shell{
+        padding:16px 14px 14px;
+        border-radius:20px;
+      }
+      .app-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:8px;
+      }
+      .badge{
+        font-size:0.75rem;
+      }
+      .content-grid{
+        grid-template-columns:1fr;
+      }
+    }
 
-/* ===== File + Transport ===== */
-.file-row{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:10px;
-  margin-bottom:12px;
-}
+    @media (max-width:600px){
+      body{
+        padding:10px;
+      }
+      .app-shell{
+        padding:14px 10px 12px;
+      }
+      .title-block h1{
+        font-size:1.4rem;
+      }
+      .project-intro{
+        font-size:0.85rem;
+      }
+      canvas{
+        height:180px;
+      }
+    }
 
-.custom-file{
-  position:relative;
-  overflow:hidden;
-  border-radius:999px;
-  border:1px dashed rgba(148,163,184,0.6);
-  padding:6px 14px;
-  font-size:0.85rem;
-  color:var(--muted);
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  background:rgba(15,23,42,0.9);
-}
+    /* ===== Panel generic ===== */
+    .panel{
+      background:radial-gradient(circle at 0 0,rgba(15,118,110,0.28),transparent 55%),
+                 radial-gradient(circle at 100% 100%,rgba(30,64,175,0.28),transparent 55%),
+                 linear-gradient(145deg,rgba(15,23,42,0.96),rgba(15,23,42,0.92));
+      border-radius:var(--radius);
+      border:1px solid var(--border-soft);
+      padding:16px 16px 14px;
+      position:relative;
+      overflow:hidden;
+    }
 
-.custom-file input{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  cursor:pointer;
-}
+    .panel h2{
+      font-size:0.95rem;
+      text-transform:uppercase;
+      letter-spacing:0.18em;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
 
-.chip{
-  font-size:0.8rem;
-  padding:4px 10px;
-  border-radius:999px;
-  background:rgba(15,23,42,0.93);
-  border:1px solid rgba(56,189,248,0.45);
-  color:#e0f2fe;
-}
+    /* ===== File + Transport ===== */
+    .file-row{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+    }
 
-/* ===== Controls ===== */
-.controls-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:12px;
-  margin-top:8px;
-}
+    .custom-file{
+      position:relative;
+      overflow:hidden;
+      border-radius:999px;
+      border:1px dashed rgba(148,163,184,0.6);
+      padding:6px 14px;
+      font-size:0.85rem;
+      color:var(--muted);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(15,23,42,0.9);
+    }
 
-.control-group{
-  font-size:0.8rem;
-}
+    .custom-file input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+    }
 
-.control-label{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:4px;
-  color:var(--muted);
-}
+    .chip{
+      font-size:0.8rem;
+      padding:4px 10px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.93);
+      border:1px solid rgba(56,189,248,0.45);
+      color:#e0f2fe;
+    }
 
-.control-label span.value{
-  font-family:monospace;
-  color:#e0f2fe;
-}
+    /* ===== Controls ===== */
+    .controls-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:12px;
+      margin-top:8px;
+    }
 
-/* Select */
-select{
-  width:100%;
-  background:rgba(15,23,42,0.95);
-  color:var(--text);
-  border-radius:999px;
-  padding:6px 10px;
-  border:1px solid rgba(148,163,184,0.7);
-  outline:none;
-  font-size:0.82rem;
-  transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease;
-}
-select:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 1px rgba(56,189,248,0.7);
-  background:rgba(15,23,42,0.98);
-}
+    .control-group{
+      font-size:0.8rem;
+    }
 
-/* Range slider */
-input[type="range"]{
-  -webkit-appearance:none;
-  appearance:none;
-  width:100%;
-  height:6px;
-  border-radius:999px;
-  background:linear-gradient(90deg,rgba(56,189,248,0.25),rgba(147,51,234,0.4));
-  outline:none;
-}
-input[type="range"]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:radial-gradient(circle,#f9fafb,#e5e7eb);
-  border:2px solid var(--accent);
-  box-shadow:0 0 10px rgba(56,189,248,0.9);
-  cursor:pointer;
-}
-input[type="range"]::-moz-range-thumb{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:#e5e7eb;
-  border:2px solid var(--accent);
-  box-shadow:0 0 10px rgba(56,189,248,0.9);
-  cursor:pointer;
-}
+    .control-label{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+      color:var(--muted);
+    }
 
-/* ===== Buttons ===== */
-.buttons-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:14px;
-}
+    .control-label span.value{
+      font-family:monospace;
+      color:#e0f2fe;
+    }
 
-.btn{
-  border:none;
-  outline:none;
-  cursor:pointer;
-  font-size:0.85rem;
-  padding:8px 16px;
-  border-radius:999px;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  letter-spacing:0.07em;
-  text-transform:uppercase;
-  font-weight:600;
-  transition:transform 0.15s ease,box-shadow 0.15s ease,background 0.15s ease,opacity 0.15s ease;
-}
+    select{
+      width:100%;
+      background:rgba(15,23,42,0.95);
+      color:var(--text);
+      border-radius:999px;
+      padding:6px 10px;
+      border:1px solid rgba(148,163,184,0.7);
+      outline:none;
+      font-size:0.82rem;
+      transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease;
+    }
+    select:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(56,189,248,0.7);
+      background:rgba(15,23,42,0.98);
+    }
 
-.btn-primary{
-  background:linear-gradient(135deg,#22c55e,#22d3ee,#6366f1);
-  color:#0b1120;
-  box-shadow:0 10px 25px rgba(34,211,238,0.55);
-}
-.btn-primary:hover{
-  transform:translateY(-1px) scale(1.02);
-  box-shadow:0 14px 30px rgba(34,211,238,0.7);
-}
-.btn-primary:active{
-  transform:translateY(0) scale(0.99);
-  box-shadow:0 6px 18px rgba(34,211,238,0.45);
-}
+    input[type="range"]{
+      -webkit-appearance:none;
+      appearance:none;
+      width:100%;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(90deg,rgba(56,189,248,0.25),rgba(147,51,234,0.4));
+      outline:none;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:radial-gradient(circle,#f9fafb,#e5e7eb);
+      border:2px solid var(--accent);
+      box-shadow:0 0 10px rgba(56,189,248,0.9);
+      cursor:pointer;
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:#e5e7eb;
+      border:2px solid var(--accent);
+      box-shadow:0 0 10px rgba(56,189,248,0.9);
+      cursor:pointer;
+    }
 
-.btn-ghost{
-  background:rgba(15,23,42,0.9);
-  color:var(--muted);
-  border:1px solid rgba(148,163,184,0.65);
-}
-.btn-ghost:hover{
-  background:rgba(30,41,59,0.98);
-  color:#e5e7eb;
-  transform:translateY(-1px);
-}
-.btn-ghost:active{
-  transform:translateY(0);
-}
+    /* ===== Buttons ===== */
+    .buttons-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
 
-/* ===== Waveform Panel ===== */
-.wave-panel{
-  position:relative;
-}
+    .btn{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      font-size:0.85rem;
+      padding:8px 16px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      letter-spacing:0.07em;
+      text-transform:uppercase;
+      font-weight:600;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background 0.15s ease,opacity 0.15s ease;
+    }
 
-.wave-panel::before{
-  content:"LIVE WAVEFORM";
-  position:absolute;
-  top:10px;
-  right:16px;
-  font-size:0.6rem;
-  letter-spacing:0.18em;
-  color:rgba(148,163,184,0.55);
-}
+    .btn-primary{
+      background:linear-gradient(135deg,#22c55e,#22d3ee,#6366f1);
+      color:#0b1120;
+      box-shadow:0 10px 25px rgba(34,211,238,0.55);
+    }
+    .btn-primary:hover{
+      transform:translateY(-1px) scale(1.02);
+      box-shadow:0 14px 30px rgba(34,211,238,0.7);
+    }
+    .btn-primary:active{
+      transform:translateY(0) scale(0.99);
+      box-shadow:0 6px 18px rgba(34,211,238,0.45);
+    }
 
-canvas{
-  width:100%;
-  height:230px;
-  border-radius:16px;
-  border:1px solid rgba(148,163,184,0.4);
-  background:radial-gradient(circle at 50% 0%,rgba(15,23,42,0.9),rgba(15,23,42,1));
-  margin-top:18px;
-  box-shadow:0 0 0 0 rgba(56,189,248,0.0);
-  transition:box-shadow 0.3s ease,border-color 0.3s ease,transform 0.3s ease;
-}
+    .btn-ghost{
+      background:rgba(15,23,42,0.9);
+      color:var(--muted);
+      border:1px solid rgba(148,163,184,0.65);
+    }
+    .btn-ghost:hover{
+      background:rgba(30,41,59,0.98);
+      color:#e5e7eb;
+      transform:translateY(-1px);
+    }
+    .btn-ghost:active{
+      transform:translateY(0);
+    }
 
-canvas.is-playing{
-  box-shadow:0 0 28px rgba(56,189,248,0.75);
-  border-color:rgba(56,189,248,0.85);
-  transform:translateY(-1px);
-}
+    /* ===== Waveform Panel ===== */
+    .wave-panel{
+      position:relative;
+    }
 
-/* ===== Audio Player ===== */
-.audio-wrapper{
-  margin-top:16px;
-  padding:10px 12px 8px;
-  border-radius:14px;
-  border:1px solid rgba(148,163,184,0.45);
-  background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(15,23,42,0.88));
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
+    .wave-panel::before{
+      content:"LIVE WAVEFORM";
+      position:absolute;
+      top:10px;
+      right:16px;
+      font-size:0.6rem;
+      letter-spacing:0.18em;
+      color:rgba(148,163,184,0.55);
+    }
 
-.audio-label{
-  font-size:0.75rem;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:0.16em;
-}
+    canvas{
+      width:100%;
+      height:230px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,0.4);
+      background:radial-gradient(circle at 50% 0%,rgba(15,23,42,0.9),rgba(15,23,42,1));
+      margin-top:18px;
+      box-shadow:0 0 0 0 rgba(56,189,248,0.0);
+      transition:box-shadow 0.3s ease,border-color 0.3s ease,transform 0.3s ease;
+    }
 
-audio{
-  width:100%;
-  filter:drop-shadow(0 4px 12px rgba(15,23,42,0.9));
-}
+    canvas.is-playing{
+      box-shadow:0 0 28px rgba(56,189,248,0.75);
+      border-color:rgba(56,189,248,0.85);
+      transform:translateY(-1px);
+    }
 
-/* ===== Footer signature ===== */
-.signature{
-  margin-top:18px;
-  text-align:center;
-  font-size:0.85rem;
-  letter-spacing:0.25em;
-  text-transform:uppercase;
-  position:relative;
-  padding-top:8px;
-}
+    /* ===== Audio Player ===== */
+    .audio-wrapper{
+      margin-top:16px;
+      padding:10px 12px 8px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,0.45);
+      background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(15,23,42,0.88));
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.signature::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:140px;
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(148,163,184,0.9),transparent);
-}
+    .audio-label{
+      font-size:0.75rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.16em;
+    }
 
-.signature span{
-  background:linear-gradient(120deg,#22d3ee,#a855f7,#f97316);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  font-weight:800;
-  text-shadow:0 0 18px rgba(56,189,248,0.7);
-  animation:glow 1.8s ease-in-out infinite alternate;
-}
+    audio{
+      width:100%;
+      filter:drop-shadow(0 4px 12px rgba(15,23,42,0.9));
+    }
 
-@keyframes glow{
-  from{
-    text-shadow:0 0 10px rgba(56,189,248,0.6),0 0 22px rgba(129,140,248,0.7);
-    opacity:0.9;
-  }
-  to{
-    text-shadow:0 0 18px rgba(251,113,133,0.9),0 0 32px rgba(129,140,248,1);
-    opacity:1;
-  }
-}
-</style>
+    /* ===== Footer signature ===== */
+    .signature{
+      margin-top:18px;
+      text-align:center;
+      font-size:0.85rem;
+      letter-spacing:0.25em;
+      text-transform:uppercase;
+      position:relative;
+      padding-top:8px;
+    }
+
+    .signature::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:140px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(148,163,184,0.9),transparent);
+    }
+
+    .signature span{
+      background:linear-gradient(120deg,#22d3ee,#a855f7,#f97316);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-weight:800;
+      text-shadow:0 0 18px rgba(56,189,248,0.7);
+      animation:glow 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow{
+      from{
+        text-shadow:0 0 10px rgba(56,189,248,0.6),0 0 22px rgba(129,140,248,0.7);
+        opacity:0.9;
+      }
+      to{
+        text-shadow:0 0 18px rgba(251,113,133,0.9),0 0 32px rgba(129,140,248,1);
+        opacity:1;
+      }
+    }
+  </style>
 </head>
 <body>
 <div class="app-shell">
@@ -421,6 +470,12 @@ audio{
       <span>Digital Signal Processing Project</span>
     </div>
   </header>
+
+  <p class="project-intro">
+    هذا المشروع يقدّم نظاماً تفاعلياً لمعالجة الإشارة الصوتية (Audio Signal Processing)،
+    حيث يمكن تطبيق مرشّحات (Low-pass / High-pass)، وتعديل درجة الصوت والسرعة في الزمن الحقيقي،
+    مع عرض شكل الموجة الصوتية (Waveform) أمام المستخدم بشكل لحظي ليوضّح تأثير المعالجة على الإشارة.
+  </p>
 
   <div class="content-grid">
     <!-- Left: controls -->
@@ -496,148 +551,147 @@ audio{
 </div>
 
 <script>
-const audio = document.getElementById('audio');
-const canvas = document.getElementById('waveformCanvas');
-const ctx = canvas.getContext('2d');
+  const audio = document.getElementById('audio');
+  const canvas = document.getElementById('waveformCanvas');
+  const ctx = canvas.getContext('2d');
 
-let audioCtx, source, analyser, filter;
-let dataArray, bufferLength, animationId;
+  let audioCtx, source, analyser, filter;
+  let dataArray, bufferLength, animationId;
 
-const cutoffValueEl = document.getElementById('cutoffValue');
-const pitchValueEl = document.getElementById('pitchValue');
-const speedValueEl = document.getElementById('speedValue');
+  const cutoffValueEl = document.getElementById('cutoffValue');
+  const pitchValueEl = document.getElementById('pitchValue');
+  const speedValueEl = document.getElementById('speedValue');
 
-function resizeCanvas(){
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
-document.getElementById('fileInput').addEventListener('change', function(e){
-  const file = e.target.files[0];
-  if(!file) return;
+  document.getElementById('fileInput').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
 
-  const url = URL.createObjectURL(file);
-  audio.src = url;
+    const url = URL.createObjectURL(file);
+    audio.src = url;
 
-  if(!audioCtx){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 2048;
-    bufferLength = analyser.fftSize;
-    dataArray = new Uint8Array(bufferLength);
-    filter = audioCtx.createBiquadFilter();
-    updateProcessing();
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      bufferLength = analyser.fftSize;
+      dataArray = new Uint8Array(bufferLength);
+      filter = audioCtx.createBiquadFilter();
+      updateProcessing();
+    }
+
+    if(source) {
+      try { source.disconnect(); } catch(err){}
+    }
+
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(filter);
+    filter.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  });
+
+  function updateProcessing(){
+    if(!filter) return;
+
+    const filterType = document.getElementById('filterType').value;
+    const cutoff = parseFloat(document.getElementById('cutoffFreq').value);
+    const pitch = parseFloat(document.getElementById('pitch').value);
+    const speed = parseFloat(document.getElementById('speed').value);
+
+    filter.type = (filterType === 'none') ? 'allpass' : filterType;
+    filter.frequency.value = cutoff;
+
+    cutoffValueEl.textContent = Math.round(cutoff) + ' Hz';
+    pitchValueEl.textContent = pitch.toFixed(1) + '×';
+    speedValueEl.textContent = speed.toFixed(1) + '×';
+
+    if(audio){
+      audio.playbackRate = pitch * speed;
+    }
   }
 
-  if(source) {
-    try { source.disconnect(); } catch(e){}
-  }
+  ['filterType','cutoffFreq','pitch','speed'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updateProcessing);
+  });
 
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(filter);
-  filter.connect(analyser);
-  analyser.connect(audioCtx.destination);
-});
+  function drawWaveform(){
+    animationId = requestAnimationFrame(drawWaveform);
+    if(!analyser) return;
 
-function updateProcessing(){
-  if(!filter) return;
+    analyser.getByteTimeDomainData(dataArray);
+    const width = canvas.width;
+    const height = canvas.height;
 
-  const filterType = document.getElementById('filterType').value;
-  const cutoff = parseFloat(document.getElementById('cutoffFreq').value);
-  const pitch = parseFloat(document.getElementById('pitch').value);
-  const speed = parseFloat(document.getElementById('speed').value);
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0,0,width,height);
 
-  // filter mapping (none => allpass)
-  filter.type = (filterType === 'none') ? 'allpass' : filterType;
-  filter.frequency.value = cutoff;
+    // grid
+    ctx.save();
+    ctx.globalAlpha = 0.15;
+    ctx.strokeStyle = "#1f2937";
+    ctx.lineWidth = 1;
+    const gridStep = 40;
+    for(let x = 0; x < width; x += gridStep){
+      ctx.beginPath();
+      ctx.moveTo(x,0);
+      ctx.lineTo(x,height);
+      ctx.stroke();
+    }
+    for(let y = 0; y < height; y += gridStep){
+      ctx.beginPath();
+      ctx.moveTo(0,y);
+      ctx.lineTo(width,y);
+      ctx.stroke();
+    }
+    ctx.restore();
 
-  cutoffValueEl.textContent = Math.round(cutoff) + ' Hz';
-  pitchValueEl.textContent = pitch.toFixed(1) + '×';
-  speedValueEl.textContent = speed.toFixed(1) + '×';
-
-  if(audio){
-    audio.playbackRate = pitch * speed;
-  }
-}
-
-['filterType','cutoffFreq','pitch','speed'].forEach(id=>{
-  document.getElementById(id).addEventListener('input', updateProcessing);
-});
-
-function drawWaveform(){
-  animationId = requestAnimationFrame(drawWaveform);
-  if(!analyser) return;
-
-  analyser.getByteTimeDomainData(dataArray);
-  const width = canvas.width;
-  const height = canvas.height;
-
-  ctx.fillStyle = "#020617";
-  ctx.fillRect(0,0,width,height);
-
-  // grid lines
-  ctx.save();
-  ctx.globalAlpha = 0.15;
-  ctx.strokeStyle = "#1f2937";
-  ctx.lineWidth = 1;
-  const gridStep = 40;
-  for(let x = 0; x < width; x += gridStep){
+    // waveform
+    ctx.lineWidth = 2;
+    const gradient = ctx.createLinearGradient(0,0,width,0);
+    gradient.addColorStop(0,"#22d3ee");
+    gradient.addColorStop(0.5,"#a855f7");
+    gradient.addColorStop(1,"#f97316");
+    ctx.strokeStyle = gradient;
     ctx.beginPath();
-    ctx.moveTo(x,0);
-    ctx.lineTo(x,height);
+
+    const sliceWidth = width / bufferLength;
+    let x = 0;
+    for(let i = 0; i < bufferLength; i++){
+      const v = dataArray[i] / 128.0;
+      const y = (v * height) / 2;
+      if(i === 0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+      x += sliceWidth;
+    }
     ctx.stroke();
   }
-  for(let y = 0; y < height; y += gridStep){
-    ctx.beginPath();
-    ctx.moveTo(0,y);
-    ctx.lineTo(width,y);
-    ctx.stroke();
-  }
-  ctx.restore();
 
-  // waveform
-  ctx.lineWidth = 2;
-  const gradient = ctx.createLinearGradient(0,0,width,0);
-  gradient.addColorStop(0,"#22d3ee");
-  gradient.addColorStop(0.5,"#a855f7");
-  gradient.addColorStop(1,"#f97316");
-  ctx.strokeStyle = gradient;
-  ctx.beginPath();
+  document.getElementById('playBtn').addEventListener('click', async function(){
+    if(!audio) return;
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+    audio.play();
+    canvas.classList.add('is-playing');
+    drawWaveform();
+  });
 
-  const sliceWidth = width / bufferLength;
-  let x = 0;
-  for(let i = 0; i < bufferLength; i++){
-    const v = dataArray[i] / 128.0;
-    const y = (v * height) / 2;
-    if(i === 0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-    x += sliceWidth;
-  }
-  ctx.stroke();
-}
-
-document.getElementById('playBtn').addEventListener('click', async function(){
-  if(!audio) return;
-  if(!audioCtx){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if(audioCtx.state === 'suspended') {
-    await audioCtx.resume();
-  }
-  audio.play();
-  canvas.classList.add('is-playing');
-  drawWaveform();
-});
-
-document.getElementById('pauseBtn').addEventListener('click', function(){
-  if(!audio) return;
-  audio.pause();
-  canvas.classList.remove('is-playing');
-  if(animationId) cancelAnimationFrame(animationId);
-});
+  document.getElementById('pauseBtn').addEventListener('click', function(){
+    if(!audio) return;
+    audio.pause();
+    canvas.classList.remove('is-playing');
+    if(animationId) cancelAnimationFrame(animationId);
+  });
 </script>
 </body>
 </html>
